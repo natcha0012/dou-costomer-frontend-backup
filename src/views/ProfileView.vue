@@ -3,13 +3,9 @@
     <div
       class="flex justify-center overflow-hidden rounded-full w-32 h-32 border-white border-[6px] shadow-md"
     >
-      <img
-        class="object-cover"
-        :src="branchUrl"
-        :alt="`branch-master-${userProfile?.branchMasterId}`"
-      />
+      <img class="object-cover" :src="branchUrl" :alt="`branch-${userProfile?.branchId}`" />
     </div>
-    <div>โต้ว สาขา {{ branchMasterDetail?.name }}</div>
+    <div>โต้ว สาขา {{ branch?.name }}</div>
     <div class="text-xs text-gray-400 flex flex-col gap-1">
       <div>Role: {{ userProfile?.role }}</div>
       <div>TelNo: {{ userProfile?.telNo || '-' }}</div>
@@ -33,19 +29,6 @@
       </div>
     </div>
     <div
-      v-for="(branch, index) in branchMasterDetail?.Branch"
-      :key="index"
-      class="flex flex-row relative gap-3 items-center text-sm text-gray-500 hover:bg-gray-300 p-2 rounded-md"
-    >
-      <button class="hover:bg-red-600 rounded-lg p-[6px]" style="background-color: orange">
-        <IconSupport class="text-white h-4 w-4"></IconSupport>
-      </button>
-      <p>ติดต่อสาขา {{ branch.name }}</p>
-      <div class="absolute right-1">
-        <IconChevronRight class="text-gray-400"></IconChevronRight>
-      </div>
-    </div>
-    <div
       class="flex flex-row relative gap-3 items-center text-sm text-gray-500 hover:bg-gray-300 p-2 rounded-md"
       @click="authStore.logout()"
     >
@@ -62,7 +45,7 @@
 <script setup lang="ts">
 import { useFetch } from '@/composables/fetch'
 import { useAuthStore } from '@/stores/auth-store'
-import type { BranchMasterDetailResp } from '@/types/branch'
+import type { BranchResp } from '@/types/branch'
 import type { UserProfile } from '@/types/user'
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -73,14 +56,11 @@ import FooterBar from '@/components/FooterBar.vue'
 
 const authStore = useAuthStore()
 const branchUrl = ref(
-  new URL(
-    `../assets/branch-imgs/branch-master${authStore.user?.branchMasterId}.jpeg`,
-    import.meta.url
-  ).href
+  new URL(`../assets/branch-imgs/branch${authStore.user?.branchId}.jpg`, import.meta.url).href
 )
 const userProfile = ref()
 
-const branchMasterDetail = ref<BranchMasterDetailResp>()
+const branch = ref<BranchResp>()
 
 onMounted(async () => {
   await getBranch()
@@ -88,16 +68,13 @@ onMounted(async () => {
 })
 
 const getBranch = async () => {
-  const { data, error } = await useFetch<BranchMasterDetailResp>(
-    'GET',
-    '/branch/branch-master-detail'
-  )
+  const { data, error } = await useFetch<BranchResp>('GET', `/branchs/${authStore.user?.branchId}`)
 
   if (!data || data.errorCode || error) {
-    alert('cannot get branch master detail')
+    alert('cannot get branch')
     return
   } else {
-    branchMasterDetail.value = data
+    branch.value = data
   }
 }
 
