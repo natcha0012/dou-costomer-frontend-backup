@@ -31,15 +31,12 @@ export const useAuthStore = defineStore({
       // store user details and jwt in local storage to keep user logged in between page refreshes
       localStorage.setItem('user', JSON.stringify(data))
 
-      if (this.user.role === UserRole.STAFF) {
-        // TODO: redirect to staff url
+      if (this.user.role !== UserRole.STAFF) {
+        // TODO: redirect to master url
         return
       }
-
       // redirect to previous url or default to home page
-      if (this.user.role === UserRole.DELIVER) {
-        router.push('/orders')
-      } else {
+      else {
         router.push(this.returnUrl || '/stock')
       }
     },

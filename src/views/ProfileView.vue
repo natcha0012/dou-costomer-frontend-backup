@@ -83,14 +83,14 @@ const userProfile = ref()
 const branchMasterDetail = ref<BranchMasterDetailResp>()
 
 onMounted(async () => {
-  await getBranchMaster()
+  await getBranch()
   await getProfile()
 })
 
-const getBranchMaster = async () => {
+const getBranch = async () => {
   const { data, error } = await useFetch<BranchMasterDetailResp>(
     'GET',
-    '/branch-master/branch-master-detail'
+    '/branch/branch-master-detail'
   )
 
   if (!data || data.errorCode || error) {

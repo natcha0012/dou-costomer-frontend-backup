@@ -12,3 +12,15 @@ export type DailyStockReportType = {
     productTypeId: number
   }[]
 }
+
+export type BranchStockResp = {
+  productType: string
+  stocks: {
+    id: number
+    branchMasterId: number
+    productId: number
+    productName: string
+    productTypeId: number
+    amount: number
+  }[]
+}

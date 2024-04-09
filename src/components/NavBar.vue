@@ -5,7 +5,7 @@
   >
     <button class="flex flex-row items-center" @click="goBack()">
       <IconBack class="mr-2"></IconBack>
-      {{ title }}
+      {{ props.name }}
     </button>
   </nav>
   <nav v-else class="relative text-white h-[70px] p-2 text-base flex items-center justify-center">
@@ -16,7 +16,7 @@
   </nav>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import IconBack from './icons/IconBack.vue'
 import router from '@/router'
 const props = defineProps<{
@@ -32,4 +32,12 @@ onMounted(() => {
 const goBack = () => {
   router.go(-1)
 }
+
+watch(
+  () => props.name,
+  () => {
+    title.value = props.name.includes('Orders') ? 'Orders' : props.name
+    console.log(title.value)
+  }
+)
 </script>

@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="h-[70px] w-full fixed bottom-0 bg-white p-2 text-base grid justify-items-center content-center grid-cols-5 gap-3"
+    class="h-[70px] w-full fixed bottom-0 bg-white p-2 text-base grid justify-items-center content-center grid-cols-4 gap-3"
   >
     <RouterLink to="/stock" v-if="user?.role !== UserRole.DELIVER">
       <div
@@ -15,35 +15,9 @@
         <span class="text-xs">Stock</span>
       </div>
     </RouterLink>
-    <RouterLink to="/production" v-if="user?.role !== UserRole.DELIVER">
+    <RouterLink to="/orders" v-if="user?.role !== UserRole.DELIVER">
       <div
-        v-if="props.focus === 'Production'"
-        class="w-fit flex justify-center items-center flex-col gap-1"
-      >
-        <img class="h-[1.5em]" src="../assets/footer-icon/book-red.png" />
-        <span class="text-xs text-red-500">Production</span>
-      </div>
-      <div v-else class="w-fit flex justify-center items-center flex-col gap-1">
-        <img class="h-[1.5em]" src="../assets/footer-icon/book.png" />
-        <span class="text-xs">Production</span>
-      </div>
-    </RouterLink>
-    <RouterLink to="/branchs" v-if="user?.role !== UserRole.DELIVER">
-      <div
-        v-if="props.focus === 'Our Branches'"
-        class="w-fit flex justify-center items-center flex-col gap-1"
-      >
-        <img class="h-[1.5em]" src="../assets/footer-icon/store-red.png" />
-        <span class="text-xs text-red-500">Branches</span>
-      </div>
-      <div v-else class="w-fit flex justify-center items-center flex-col gap-1">
-        <img class="h-[1.5em]" src="../assets/footer-icon/store.png" />
-        <span class="text-xs">Branches</span>
-      </div>
-    </RouterLink>
-    <RouterLink to="/orders">
-      <div
-        v-if="props.focus === 'Orders'"
+        v-if="props.focus === 'Order'"
         class="w-fit flex justify-center items-center flex-col gap-1"
       >
         <img class="h-[1.5em]" src="../assets/footer-icon/bag-red.png" />
@@ -52,6 +26,19 @@
       <div v-else class="w-fit flex justify-center items-center flex-col gap-1">
         <img class="h-[1.5em]" src="../assets/footer-icon/bag.png" />
         <span class="text-xs">Order</span>
+      </div>
+    </RouterLink>
+    <RouterLink to="/orders">
+      <div
+        v-if="props.focus === 'Bills'"
+        class="w-fit flex justify-center items-center flex-col gap-1"
+      >
+        <img class="h-[1.5em]" src="../assets/footer-icon/bag-red.png" />
+        <span class="text-xs text-red-500">Bills</span>
+      </div>
+      <div v-else class="w-fit flex justify-center items-center flex-col gap-1">
+        <img class="h-[1.5em]" src="../assets/footer-icon/bag.png" />
+        <span class="text-xs">Bills</span>
       </div>
     </RouterLink>
     <RouterLink to="/profile">

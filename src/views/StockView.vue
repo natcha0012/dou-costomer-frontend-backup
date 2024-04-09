@@ -1,30 +1,109 @@
 <template>
-  <div
-    class="sticky top-0 -mx-6 -my-10 px-6 py-5 z-20 flex items-end text-sm font-medium text-center text-white bg-[--vt-primary-blue]"
-  >
-    <ul class="grid grid-flow-col-dense grid-cols-2 w-full pl-3 pr-3">
-      <li @click="currentTab = 1">
-        <a :class="currentTab === 1 ? activeTab : normalTab">Stock</a>
-      </li>
-      <li @click="currentTab = 2">
-        <a :class="currentTab === 2 ? activeTab : normalTab">Purchase Control</a>
-      </li>
-    </ul>
-  </div>
-  <div class="mt-[70px] w-full h-full">
-    <div v-if="currentTab === 1">
-      <DailyStockReport></DailyStockReport>
-    </div>
-    <div v-else>
-      <LimitStock></LimitStock>
+  <!-- <div class="w-full mt-3 border-b border-gray-500"></div> -->
+  <div v-for="(item, index) in stock" :key="index">
+    <div class="py-4 text-center">{{ item.productType }}</div>
+
+    <div class="relative overflow-auto rounded-lg">
+      <table class="w-full text-sm text-center">
+        <thead class="text-xs">
+          <tr class="px-4">
+            <th
+              v-for="header in headers"
+              :key="header"
+              scope="col"
+              class="py-3 px-1"
+              :class="{ 'pl-2': header === 'รายการ' }"
+            >
+              {{ header }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="product in item.stocks" :key="product.id" class="bg-white border-b">
+            <td class="w-[60px]">img</td>
+            <td class="text-left px-0">
+              {{ product.productName }}
+            </td>
+            <td class="w-[100px] py-1">
+              <input
+                v-if="isEdit"
+                :value="product.amount"
+                @change="changeInput(product.productId, ($event.target as HTMLInputElement).value)"
+                type="number"
+                class="w-[40px] p-1 border rounded-md text-center"
+              />
+              <div v-else>{{ product.amount ?? 0 }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import DailyStockReport from '@/components/Stock/DailyStockReport.vue'
-import LimitStock from '@/components/Stock/LimitStock.vue'
-import { ref } from 'vue'
-const currentTab = ref(1)
-const activeTab = 'inline-block pb-4 border-b-2 border-red-600 w-full'
-const normalTab = 'inline-block w-full pb-4 border-b-2 border-gray-300'
+import { useFetch } from '@/composables/fetch'
+import { useAuthStore } from '@/stores/auth-store'
+import type { BranchStockResp } from '@/types/stock'
+import { onMounted, ref, watch } from 'vue'
+
+const stock = ref<BranchStockResp[]>([])
+const headers = ['รายการ', '', 'จำนวนคงเหลือ']
+const rawUpdatedData: Record<number, number> = {}
+const { user } = useAuthStore()
+const isEdit = ref(false)
+
+onMounted(async () => {
+  console.log('get branch stock')
+  await getBranchStock()
+})
+
+const getBranchStock = async () => {
+  if (!user?.branchId) {
+    return
+  }
+  const { data, error } = await useFetch<BranchStockResp[]>('GET', `/stock/branch/${user.branchId}`)
+
+  if (!data || data.errorCode || error) {
+    alert('cannot get branchStock')
+    return
+  } else {
+    stock.value = data
+  }
+}
+
+const changeInput = (productId: number, value: string) => {
+  rawUpdatedData[productId] = Number(value)
+}
+
+const updateLimit = async () => {
+  const items = []
+  for (const pId of Object.keys(rawUpdatedData)) {
+    const productId = Number(pId)
+    items.push({ productId, limit: rawUpdatedData[productId] })
+  }
+
+  const { data, error } = await useFetch<BranchStockResp[]>(
+    'POST',
+    `/stock/branch/${user?.branchId}`,
+    {
+      stock: []
+    }
+  )
+
+  if (!data || data.errorCode || error) {
+    alert('cannot update branch stock')
+    return
+  } else {
+    stock.value = data
+  }
+}
+
+watch(
+  () => isEdit,
+  async (newV) => {
+    if (newV.value === false) {
+      await updateLimit()
+    }
+  }
+)
 </script>
