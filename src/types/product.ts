@@ -10,4 +10,7 @@ export type ProductResp = {
   limit: number
   productTypeId: number
   stockLeft: number
+  inCart?: number
+  input?: string
+  showError?: boolean
 }

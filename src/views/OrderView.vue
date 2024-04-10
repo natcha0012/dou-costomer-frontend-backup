@@ -26,7 +26,9 @@
     <img class="h-[1.5em]" src="../assets/footer-icon/bag.png" />
     <span>มีสินค้าในตะกร้า ทั้งหมด {{ inCartItemAmount }} รายการ</span>
     <div class="absolute right-4">
-      <button class="rounded-md bg-black text-white text-xs p-2">My Cart</button>
+      <button class="rounded-md bg-black text-white text-xs p-2" @click="saveOrder()">
+        My Cart
+      </button>
     </div>
   </div>
   <!-- Product Items -->
@@ -41,8 +43,27 @@
         <div>{{ product.name }}</div>
         <div class="text-xs">ราคา / หน่วย: {{ product.price }}</div>
         <div>
-          <input class="rounded-md w-[40px] h-[25px] border mr-2" type="number" />
+          <input
+            v-model="product.input"
+            @keyup.enter="
+              () => {
+                if (Number(product.input) > product.limit) {
+                  product.showError = true
+                  return
+                }
+                product.showError = false
+                product.inCart = Number(product.input || 0)
+                product.input = ''
+                updateOrder(product.id, product.inCart)
+              }
+            "
+            class="rounded-md w-[40px] h-[25px] border mr-2 text-xs p-2"
+            type="number"
+          />
           <label class="text-xs">หน่วย</label>
+        </div>
+        <div :class="{ hidden: !product.showError }" class="text-red-500 text-xs">
+          กรุณากรอกตัวเลขที่น้อยกว่า {{ product.limit }}
         </div>
       </div>
       <div class="absolute right-4 top-4 justify-end text-xs flex flex-col gap-2 text-gray-500">
@@ -51,26 +72,42 @@
           limit: <label class="text-orange-500">{{ product.limit }}</label>
         </p>
       </div>
-      <div class="absolute right-4 bottom-4 text-xs text-green-500">In Cart: 0</div>
+      <div class="absolute right-4 bottom-4 text-xs text-green-500">
+        In Cart: {{ product.inCart ?? 0 }}
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import IconSerch from '@/components/icons/IconSerch.vue'
 import { useFetch } from '@/composables/fetch'
 import type { ProductResp, ProductTypeResp } from '@/types/product'
+import type { AddInCartOrderReq } from '@/types/order'
 const productFilter = ref<string>('')
 
 const currentTab = ref(0)
 const activeTab = 'inline-block pb-2 border-b-2 px-4 border-red-600 w-full'
 const normalTab = 'inline-block w-full pb-2 px-4 border-b-2 border-gray-300'
 const productTypes = ref<ProductTypeResp[]>([])
-const products = ref<ProductResp[]>([])
+const rawProducts = ref<ProductResp[]>([])
+const order: Record<number, number> = {}
 const inCartItemAmount = ref(0)
 onMounted(async () => {
   await getProductType()
   await getProducts()
+})
+
+const products = computed(() => {
+  let totalItem = rawProducts.value
+  if (productFilter.value) {
+    totalItem = totalItem.filter((item) => item.name.includes(productFilter.value))
+  }
+  if (currentTab.value === 0) {
+    return totalItem
+  } else {
+    return totalItem.filter((p) => p.productTypeId === currentTab.value)
+  }
 })
 
 const getProductType = async () => {
@@ -90,8 +127,24 @@ const getProducts = async () => {
     alert(data?.msg)
     return
   } else {
-    products.value = data
+    rawProducts.value = data
   }
   return
+}
+
+const updateOrder = async (productId: number, amount: number) => {
+  order[productId] = amount
+  inCartItemAmount.value = Object.keys(order).length
+}
+
+const saveOrder = () => {
+  const orderBody: AddInCartOrderReq = { orders: [] }
+  for (const [key, value] of Object.entries(order)) {
+    orderBody.orders.push({
+      productId: Number(key),
+      amount: value
+    })
+  }
+  localStorage.setItem('orders', JSON.stringify(orderBody))
 }
 </script>

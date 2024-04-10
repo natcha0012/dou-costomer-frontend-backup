@@ -40,3 +40,10 @@ export type ProductDetail = {
   productName: string
   confirm?: boolean
 }
+
+export type AddInCartOrderReq = {
+  orders: {
+    productId: number
+    amount: number
+  }[]
+}
