@@ -25,22 +25,32 @@ const router = createRouter({
       component: () => import('../views/BranchView.vue')
     },
     {
-      path: '/orders',
+      path: '/order',
       children: [
         {
-          name: 'Orders',
+          name: 'Order',
           path: '',
           component: () => import('../views/OrderView.vue')
+        }
+      ]
+    },
+    {
+      path: '/bills',
+      children: [
+        {
+          name: 'Bills',
+          path: '',
+          component: () => import('../views/BillView.vue')
         },
         {
-          name: 'Orders Confirm',
+          name: 'Bills Confirm',
           path: 'confirm/:orderId',
-          component: () => import('../views/OrderConfirmView.vue')
+          component: () => import('../views/BillConfirmView.vue')
         },
         {
-          name: 'Orders Detail',
+          name: 'Bills Detail',
           path: 'detail/:orderId',
-          component: () => import('../views/OrderDetailView.vue')
+          component: () => import('../views/BillDetailView.vue')
         }
       ]
     },

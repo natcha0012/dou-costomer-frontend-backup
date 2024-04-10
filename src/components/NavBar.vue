@@ -9,7 +9,7 @@
     </button>
   </nav>
   <nav v-else class="relative text-white h-[70px] p-2 text-base flex items-center justify-center">
-    <button v-if="props.name.includes('Orders ')" class="absolute left-2" @click="goBack()">
+    <button v-if="props.name.includes('Bills ')" class="absolute left-2" @click="goBack()">
       <IconBack></IconBack>
     </button>
     {{ title }}
@@ -26,7 +26,7 @@ const props = defineProps<{
 const title = ref('')
 
 onMounted(() => {
-  title.value = props.name.includes('Orders') ? 'Orders' : props.name
+  title.value = props.name.includes('Bills') ? 'Bills' : props.name
 })
 
 const goBack = () => {
@@ -36,7 +36,7 @@ const goBack = () => {
 watch(
   () => props.name,
   () => {
-    title.value = props.name.includes('Orders') ? 'Orders' : props.name
+    title.value = props.name.includes('Bills') ? 'Bills' : props.name
     console.log(title.value)
   }
 )

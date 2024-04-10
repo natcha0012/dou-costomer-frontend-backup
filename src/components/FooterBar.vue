@@ -2,7 +2,7 @@
   <footer
     class="h-[70px] w-full fixed bottom-0 bg-white p-2 text-base grid justify-items-center content-center grid-cols-4 gap-3"
   >
-    <RouterLink to="/stock" v-if="user?.role !== UserRole.DELIVER">
+    <RouterLink to="/stock">
       <div
         v-if="props.focus === 'My Stock'"
         class="w-fit flex justify-center items-center flex-col gap-1"
@@ -15,7 +15,7 @@
         <span class="text-xs">Stock</span>
       </div>
     </RouterLink>
-    <RouterLink to="/orders" v-if="user?.role !== UserRole.DELIVER">
+    <RouterLink to="/order">
       <div
         v-if="props.focus === 'Order'"
         class="w-fit flex justify-center items-center flex-col gap-1"
@@ -28,16 +28,16 @@
         <span class="text-xs">Order</span>
       </div>
     </RouterLink>
-    <RouterLink to="/orders">
+    <RouterLink to="/bills">
       <div
         v-if="props.focus === 'Bills'"
         class="w-fit flex justify-center items-center flex-col gap-1"
       >
-        <img class="h-[1.5em]" src="../assets/footer-icon/bag-red.png" />
+        <IconBills style="color: red"></IconBills>
         <span class="text-xs text-red-500">Bills</span>
       </div>
       <div v-else class="w-fit flex justify-center items-center flex-col gap-1">
-        <img class="h-[1.5em]" src="../assets/footer-icon/bag.png" />
+        <IconBills></IconBills>
         <span class="text-xs">Bills</span>
       </div>
     </RouterLink>
@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { UserRole } from '@/constant.ts/user.enum'
 import { useAuthStore } from '@/stores/auth-store'
+import IconBills from '@/components/icons/IconBills.vue'
 
 const { user } = useAuthStore()
 const props = defineProps<{
