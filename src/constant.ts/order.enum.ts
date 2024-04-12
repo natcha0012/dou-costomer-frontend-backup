@@ -15,11 +15,11 @@ export enum OrderStatus {
 
 export const OrderThaiStatus: Record<OrderStatus, string> = {
   IN_CART: 'อยู่ในตะกร้า',
-  ORDER_PLACED: 'ยังไม่จัดสินค้า',
+  ORDER_PLACED: 'คำสั่งซื้อสำเร็จ',
   PACKING: 'กำลังจัดสินค้า',
   PACKED: 'บรรจุสินค้าเรียบร้อย',
   DELIVERING: 'กำลังจัดส่งสินค้า',
-  DELIVERED: 'จัดส่งสินค้าสำเร็จ',
+  DELIVERED: 'ตรวจเช็คสินค้า',
   PRODUCT_PROBLEMS: 'จัดส่งสินค้ามีปัญหา',
   WAITING_FOR_PAYMENT: 'รอชำระเงิน',
   WAITING_FOR_APPROVED: 'รอตรวจสลิปการโอนเงิน',

@@ -32,7 +32,7 @@
     </div>
   </div>
   <!-- Product Items -->
-  <div class="flex flex-col mt-2 gap-2">
+  <div class="flex flex-col mt-2 gap-3">
     <div
       v-for="product in products"
       :key="product.id"
@@ -54,7 +54,7 @@
                 product.showError = false
                 product.inCart = Number(product.input || 0)
                 product.input = ''
-                updateOrder(product.id, product.inCart)
+                updateOrder(product)
               }
             "
             class="rounded-md w-[40px] h-[25px] border mr-2 text-xs p-2"
@@ -72,7 +72,10 @@
           limit: <label class="text-orange-500">{{ product.limit }}</label>
         </p>
       </div>
-      <div class="absolute right-4 bottom-4 text-xs text-green-500">
+      <div
+        class="absolute right-4 bottom-4 text-xs font-bold"
+        :class="{ 'text-green-500': product.inCart }"
+      >
         In Cart: {{ product.inCart ?? 0 }}
       </div>
     </div>
@@ -83,7 +86,8 @@ import { computed, onMounted, ref } from 'vue'
 import IconSerch from '@/components/icons/IconSerch.vue'
 import { useFetch } from '@/composables/fetch'
 import type { ProductResp, ProductTypeResp } from '@/types/product'
-import type { AddInCartOrderReq } from '@/types/order'
+import type { AddInCartOrderReq, PreviewOrderItems } from '@/types/order'
+import { useRouter } from 'vue-router'
 const productFilter = ref<string>('')
 
 const currentTab = ref(0)
@@ -91,8 +95,9 @@ const activeTab = 'inline-block pb-2 border-b-2 px-4 border-red-600 w-full'
 const normalTab = 'inline-block w-full pb-2 px-4 border-b-2 border-gray-300'
 const productTypes = ref<ProductTypeResp[]>([])
 const rawProducts = ref<ProductResp[]>([])
-const order: Record<number, number> = {}
+const order: Record<number, ProductResp> = {}
 const inCartItemAmount = ref(0)
+const router = useRouter()
 onMounted(async () => {
   await getProductType()
   await getProducts()
@@ -132,19 +137,39 @@ const getProducts = async () => {
   return
 }
 
-const updateOrder = async (productId: number, amount: number) => {
-  order[productId] = amount
+const updateOrder = async (product: ProductResp) => {
+  order[product.id] = product
   inCartItemAmount.value = Object.keys(order).length
 }
 
 const saveOrder = () => {
-  const orderBody: AddInCartOrderReq = { orders: [] }
-  for (const [key, value] of Object.entries(order)) {
-    orderBody.orders.push({
-      productId: Number(key),
-      amount: value
-    })
+  const previewOrders: PreviewOrderItems[] = []
+  for (const value of Object.values(order)) {
+    const productType = productTypes.value.find((pt) => pt.id === value.productTypeId)
+    if (!productType) continue
+    const index = previewOrders.findIndex((p) => p.productType === productType.name)
+    if (index === -1) {
+      previewOrders.push({
+        productType: productType.name,
+        products: [
+          {
+            id: value.id,
+            name: value.name,
+            amount: value.inCart ?? 0,
+            pricePerAmount: value.price
+          }
+        ]
+      })
+    } else {
+      previewOrders[index].products.push({
+        id: value.id,
+        name: value.name,
+        amount: value.inCart ?? 0,
+        pricePerAmount: value.price
+      })
+    }
   }
-  localStorage.setItem('orders', JSON.stringify(orderBody))
+  localStorage.setItem('orders', JSON.stringify(previewOrders))
+  router.push('/order/my-cart')
 }
 </script>

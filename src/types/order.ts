@@ -47,3 +47,14 @@ export type AddInCartOrderReq = {
     amount: number
   }[]
 }
+
+export type PreviewOrderItems = {
+  productType: string
+  products: {
+    id: number
+    name: string
+    amount: number
+    pricePerAmount: string
+    balance?: string
+  }[]
+}

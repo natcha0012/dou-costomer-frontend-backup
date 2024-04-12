@@ -16,8 +16,6 @@
 </template>
 <script setup lang="ts">
 import { OrderThaiStatus, OrderStatus } from '@/constant.ts/order.enum'
-import { UserRole } from '@/constant.ts/user.enum'
-import { useAuthStore } from '@/stores/auth-store'
 import { useRouter } from 'vue-router'
 const props = defineProps<{
   branchName: string
@@ -26,33 +24,13 @@ const props = defineProps<{
   color: string
   orderId: string
 }>()
-
-const { user } = useAuthStore()
 const router = useRouter()
 
 const selectCard = () => {
-  if (props.status === OrderStatus.ORDER_PLACED || props.status === OrderStatus.PACKING) {
-    if (user?.role === UserRole.ADMIN || user?.role === UserRole.PACKING) {
-      router.push(`/orders/confirm/${props.orderId}`)
-    } else {
-      router.push(`/orders/detail/${props.orderId}`)
-    }
-  }
-
-  if (props.status === OrderStatus.PACKED) {
-    if (user?.role === UserRole.ADMIN || user?.role === UserRole.DELIVER) {
-      router.push(`/orders/confirm/${props.orderId}`)
-    } else {
-      router.push(`/orders/detail/${props.orderId}`)
-    }
-  }
-
-  if (
-    props.status === OrderStatus.DELIVERING ||
-    props.status === OrderStatus.SUCCESS ||
-    props.status === OrderStatus.DELIVERED
-  ) {
-    router.push(`/orders/detail/${props.orderId}`)
+  if (props.status === OrderStatus.DELIVERED) {
+    router.push(`/bills/confirm/${props.orderId}`)
+  } else {
+    router.push(`/bills/detail/${props.orderId}`)
   }
 
   return
