@@ -10,10 +10,8 @@
       </p>
     </div>
     <div v-if="showDeliveredButton" class="flex justify-center">
-      <button
-        @click="deliveredOrder()"
-        class="flex flex-row py-2 px-4 rounded-lg w-fit bg-gray-700 text-white font-bold text-sm items-center gap-2"
-      >
+      <button @click="deliveredOrder()"
+        class="flex flex-row py-2 px-4 rounded-lg w-fit bg-gray-700 text-white font-bold text-sm items-center gap-2">
         <IconTruck></IconTruck>
         Delivered
       </button>
@@ -28,30 +26,42 @@
         <table class="w-full text-sm text-left">
           <thead class="text-xs">
             <tr class="px-4">
-              <th
-                v-for="header in headers"
-                :key="header"
-                scope="col"
-                class="py-3 px-1"
-                :class="{ 'pl-3': header === 'รายการ' }"
-              >
+              <th v-for="header in headers" :key="header" scope="col" class="py-3 px-1 whitespace-nowrap"
+                :class="{ 'pl-3': header === 'รายการ' }">
                 {{ header }}
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(product, i2) in pdlist.products" :key="i2" class="bg-white border-b">
-              <td class="pl-3">img</td>
-              <td class="flex flex-col text-left">
-                <div class="w-[150px] px-0 mb-1">
-                  {{ product.productName }}
+              <!-- <td>
+                <div class="flex items-center justify-center">
+                  <Tooltip v-model="product.remark">
+                    <img class="w-[20px]" src="../assets/img-icons/circle-info-solid.svg" />
+                  </Tooltip>
                 </div>
-                <div class="text-xs">ราคา/หน่วย: {{ product.pricePerOne }}</div>
+              </td> -->
+              <td class="flex flex-grow items-center">
+                <Tooltip class=" mr-2 w-[20px]" v-model="product.remark">
+                  <img class="w-[20px]" src="../assets/img-icons/circle-info-solid.svg" />
+                </Tooltip>
+                <div>
+                  <div class=" px-0 mb-1">
+                    {{ product.productName }}
+                  </div>
+                  <div class="text-xs whitespace-nowrap">ราคา/หน่วย: {{ product.pricePerOne }}</div>
+                </div>
               </td>
-              <td class="text-left w-[100px]">
-                <div class="px-0 mb-1">{{ product.amount }} หน่วย</div>
+              <td class="text-left whitespace-nowrap">
+                <div class="px-0 mb-1">{{ product.orderedAmount }} หน่วย</div>
+              </td>
+              <td class="text-left whitespace-nowrap">
+                <div class="px-0 mb-1">{{ product.actualAmount }} หน่วย</div>
                 <div class="text-xs">{{ product.balance.toFixed(2) }} บาท</div>
               </td>
+              <!-- <td>
+                <div class=" whitespace-nowrap">{{ product.balance.toFixed(2) }} บาท</div>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -84,14 +94,16 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { UserRole } from '@/constant.ts/user.enum'
+import Tooltip from '@/components/TooltipRemark.vue'
 const route = useRoute()
 const router = useRouter()
 const orderId = route.params.orderId
 const order = ref<GetOrderByIDResp>()
 const totalProduct = ref(0)
-const headers = ['รายการ', '', 'จำนวนสินค้า']
+const headers = ['รายการ', 'จำนวนที่สั่ง', 'จำนวนที่จัดส่ง']
 const { user } = useAuthStore()
 const showDeliveredButton = ref(false)
+
 onMounted(async () => {
   await getOrder()
 })
@@ -127,6 +139,6 @@ const deliveredOrder = async () => {
     alert('cannot change status')
     return
   }
-  router.push('/orders')
+  router.push('/bills')
 }
 </script>

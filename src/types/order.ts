@@ -33,12 +33,18 @@ export type GetOrderByIDResp = {
 }
 
 export type ProductDetail = {
-  amount: number
-  balance: number
-  pricePerOne: number
   productId: number
   productName: string
-  confirm?: boolean
+  orderedAmount: number
+  actualAmount: number
+  remark: RemarkTooltip
+  pricePerOne: number
+  balance: number
+  confirm: boolean
+}
+export type RemarkTooltip = {
+  masterRemark?: string
+  branchRemark?: string
 }
 
 export type AddInCartOrderReq = {
